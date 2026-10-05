@@ -1,24 +1,25 @@
 import os
-import logging
-from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from flask import Flask
+from threading import Thread
 
-# Logging setup
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
+# Render Port Keep-Alive Web Server
+app = Flask('')
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("வணக்கம்! Mokka Comedy Bot தயார்!")
+@app.route('/')
+def home():
+    return "Bot is running live!"
 
-if __name__ == '__main__':
-    # Token Environment Variable மூலம் பெறப்படும்
-    token = os.environ.get("BOT_TOKEN")
-    if not token:
-        print("Error: BOT_TOKEN கிடைக்கவில்லை!")
-    else:
-        app = ApplicationBuilder().token(token).build()
-        app.add_handler(CommandHandler("start", start))
-        print("Bot இயங்குகிறது...")
-        app.run_polling()
+def run():
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port)
+
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
+
+# பாட் தொடங்கும் முன் Web Server-ஐ இயக்கவும்
+keep_alive()
+
+# ----------------------------------------------------
+# உங்கள் பழைய Telegram Bot imports & code கீழே தொடரும்...
+# ----------------------------------------------------
